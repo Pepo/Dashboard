@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(ls /Users/pepo/Documents/Dashboard/*.js /Users/pepo/Documents/Dashboard/*.ts /Users/pepo/Documents/Dashboard/server*)",
+      "Bash(gh auth:*)",
+      "Bash(git --version)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

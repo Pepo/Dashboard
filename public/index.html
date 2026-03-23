@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div id="clock"></div>
+    <div id="date-display"></div>
+  </header>
+
+  <main>
+    <!-- ÖPNV Verbindungen -->
+    <section class="card" id="transport-card">
+      <div class="card-header">
+        <span class="card-icon">🚆</span>
+        <div class="card-title-block">
+          <h2>Nächste Verbindungen</h2>
+          <p class="card-subtitle">Schlachthofstr. 43, Bochum → Iltisstr. 38, Wuppertal</p>
+        </div>
+        <button class="refresh-btn" onclick="loadTransport()" title="Aktualisieren">↻</button>
+      </div>
+      <div id="transport-content" class="loading-state">Lädt…</div>
+    </section>
+
+    <!-- Linie 302 -->
+    <section class="card" id="line302-card">
+      <div class="card-header">
+        <span class="card-icon">🚊</span>
+        <div class="card-title-block">
+          <h2>Linie 302</h2>
+          <p class="card-subtitle">Nächste Abfahrten – beide Richtungen</p>
+        </div>
+        <button class="refresh-btn" onclick="loadLine302()" title="Aktualisieren">↻</button>
+      </div>
+      <div id="line302-content" class="loading-state">Lädt…</div>
+    </section>
+
+    <!-- Lichter -->
+    <section class="card" id="lights-card">
+      <div class="card-header">
+        <span class="card-icon">💡</span>
+        <div class="card-title-block">
+          <h2>Lichter</h2>
+          <p class="card-subtitle">LEDVANCE Smart+</p>
+        </div>
+        <button class="refresh-btn" onclick="loadLights()" title="Aktualisieren">↻</button>
+      </div>
+      <div id="lights-content" class="loading-state">Lädt…</div>
+    </section>
+
+    <div class="bottom-row">
+      <!-- Kalender -->
+      <section class="card" id="calendar-card">
+        <div class="card-header">
+          <span class="card-icon">📅</span>
+          <div class="card-title-block">
+            <h2>Termine</h2>
+            <p class="card-subtitle">Nächste 14 Tage</p>
+          </div>
+          <button class="refresh-btn" onclick="loadCalendar()" title="Aktualisieren">↻</button>
+        </div>
+        <div id="calendar-content" class="loading-state">Lädt…</div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Journey Modal -->
+  <div class="journey-modal-overlay hidden" id="journey-modal-overlay" onclick="closeJourneyModal(event)">
+    <div class="journey-modal">
+      <div class="journey-modal-handle"></div>
+      <div id="journey-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
