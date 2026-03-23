@@ -147,10 +147,14 @@ function openJourneyModal(i) {
   const arrDelay = j.arrDelay > 0 ? ` <span class="delay">+${Math.round(j.arrDelay)}'</span>` : '';
 
   const legItems = j.legs.map((l, li) => {
-    const isLast   = li === j.legs.length - 1;
-    const lDep     = l.depDelay > 0 ? ` <span class="delay">+${Math.round(l.depDelay)}'</span>` : '';
-    const lArr     = l.arrDelay > 0 ? ` <span class="delay">+${Math.round(l.arrDelay)}'</span>` : '';
-    const dirLabel = l.direction ? `<span class="journey-leg-direction">→ ${l.direction}</span>` : '';
+    const isLast      = li === j.legs.length - 1;
+    const nextLeg     = j.legs[li + 1];
+    const lDep        = l.depDelay > 0 ? ` <span class="delay">+${Math.round(l.depDelay)}'</span>` : '';
+    const lArr        = l.arrDelay > 0 ? ` <span class="delay">+${Math.round(l.arrDelay)}'</span>` : '';
+    const dirLabel    = l.direction ? `<span class="journey-leg-direction">→ ${l.direction}</span>` : '';
+    const transferMin = !isLast && nextLeg
+      ? Math.round((new Date(nextLeg.depTime) - new Date(l.arrTime)) / 60000)
+      : 0;
 
     return `
       <div class="journey-leg">
@@ -167,16 +171,17 @@ function openJourneyModal(i) {
           </div>
         </div>
       </div>
-      ${isLast ? `
       <div class="journey-leg">
         <div class="journey-leg-line">
-          <div class="journey-leg-dot last"></div>
+          <div class="journey-leg-dot ${isLast ? 'last' : 'transfer'}"></div>
+          ${!isLast ? '<div class="journey-leg-connector dashed"></div>' : ''}
         </div>
         <div class="journey-leg-body">
           <div class="journey-leg-stop">${l.toStop || '–'}</div>
           <div class="journey-leg-time">${fmtTime(l.arrTime)}${lArr}</div>
+          ${!isLast ? `<div class="transfer-chip">⏱ ${transferMin} Min. Umsteigen</div>` : ''}
         </div>
-      </div>` : ''}`;
+      </div>`;
   }).join('');
 
   document.getElementById('journey-modal-body').innerHTML = `

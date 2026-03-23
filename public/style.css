@@ -621,3 +621,29 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.journey-leg-dot.transfer {
+  background: var(--yellow);
+  box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 3px var(--yellow);
+}
+
+.journey-leg-connector.dashed {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--card-border) 0, var(--card-border) 4px,
+    transparent 4px, transparent 8px
+  );
+}
+
+.transfer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--yellow);
+  background: rgba(210,153,34,0.12);
+  border: 1px solid rgba(210,153,34,0.3);
+  border-radius: 5px;
+  padding: 2px 8px;
+  margin-top: 6px;
+}
