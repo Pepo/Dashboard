@@ -202,79 +202,55 @@ function closeJourneyModal(e) {
   document.getElementById('journey-modal-overlay').classList.add('hidden');
 }
 
-// ── Kalender ──────────────────────────────────────────
-function groupByDay(events) {
-  const groups = {};
-  for (const ev of events) {
-    const d   = new Date(ev.start);
-    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    if (!groups[key]) groups[key] = { date: d, events: [] };
-    groups[key].events.push(ev);
-  }
-  return Object.values(groups).sort((a,b) => a.date - b.date);
-}
+// ── Schalke 04 – Nächstes Spiel ───────────────────────
+const S04_MATCHES = [
+  { date: '2026-04-05T13:30:00', opponent: 'Karlsruher SC',   home: true,  spieltag: 28 },
+  { date: '2026-04-12T13:30:00', opponent: 'SV Elversberg',   home: false, spieltag: 29 },
+  { date: '2026-04-19T13:30:00', opponent: 'Preußen Münster', home: true,  spieltag: 30 },
+  { date: '2026-04-25T15:30:00', opponent: 'SC Paderborn 07', home: false, spieltag: 31 },
+];
 
-function dayLabel(date) {
+function renderSchalke() {
   const now   = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const d     = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const diff  = Math.round((d - today) / 86400000);
+  const match = S04_MATCHES.find(m => new Date(m.date) > now);
+  const el    = document.getElementById('schalke-content');
+  if (!el) return;
 
-  if (diff === 0) return 'Heute';
-  if (diff === 1) return 'Morgen';
-  if (diff === 2) return 'Übermorgen';
-  return `${DE_DAYS[date.getDay()]}, ${date.getDate()}. ${DE_MONTHS[date.getMonth()]}`;
+  if (!match) {
+    el.innerHTML = '<div class="empty-state">Keine weiteren Spiele hinterlegt.</div>';
+    return;
+  }
+
+  const matchDate  = new Date(match.date);
+  const diffMs     = matchDate - now;
+  const diffDays   = Math.floor(diffMs / 86400000);
+  const diffHours  = Math.floor((diffMs % 86400000) / 3600000);
+  const diffMins   = Math.floor((diffMs % 3600000) / 60000);
+
+  const dateStr = `${DE_DAYS[matchDate.getDay()]}, ${matchDate.getDate()}. ${DE_MONTHS[matchDate.getMonth()]} ${matchDate.getFullYear()}`;
+  const timeStr = `${String(matchDate.getHours()).padStart(2,'0')}:${String(matchDate.getMinutes()).padStart(2,'0')} Uhr`;
+
+  let countdown;
+  if (diffDays > 0)       countdown = `in ${diffDays} Tag${diffDays !== 1 ? 'en' : ''} ${diffHours}h`;
+  else if (diffHours > 0) countdown = `in ${diffHours}h ${diffMins} Min.`;
+  else                    countdown = `in ${diffMins} Min.`;
+
+  el.innerHTML = `
+    <div class="s04-match">
+      <div class="s04-badge">${match.home ? 'Heimspiel' : 'Auswärtsspiel'} · ${match.spieltag}. Spieltag</div>
+      <div class="s04-opponent">
+        <span class="s04-club">FC Schalke 04</span>
+        <span class="s04-vs">${match.home ? 'vs.' : '@'}</span>
+        <span class="s04-club">${match.opponent}</span>
+      </div>
+      <div class="s04-datetime">${dateStr} · ${timeStr}</div>
+      <div class="s04-countdown">${countdown}</div>
+    </div>`;
 }
 
-async function loadCalendar() {
-  const btn     = document.querySelector('#calendar-card .refresh-btn');
-  const content = document.getElementById('calendar-content');
-
-  btn.classList.add('spinning');
-  content.innerHTML = '<div class="loading-state">Lädt…</div>';
-
-  try {
-    const res    = await fetch('/api/calendar');
-    const events = await res.json();
-
-    if (!res.ok) throw new Error(events.error || 'Unbekannter Fehler');
-
-    if (events.length === 0) {
-      content.innerHTML = '<div class="empty-state">Keine Termine in den nächsten 14 Tagen.</div>';
-      return;
-    }
-
-    const groups = groupByDay(events);
-    const html = `
-      <div class="event-list">
-        ${groups.map(g => `
-          <div class="event-day-group">
-            <div class="event-day-label">${dayLabel(g.date)}</div>
-            ${g.events.map(ev => {
-              const isAllDay = ev.allDay;
-              const timeStr  = isAllDay
-                ? 'Ganztägig'
-                : `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
-              return `
-                <div class="event-item">
-                  <div class="event-color-dot" style="background:${ev.calColor || '#4a90e2'}"></div>
-                  <div class="event-info">
-                    <div class="event-title">${ev.title}</div>
-                    <div class="event-time">${timeStr}</div>
-                    ${ev.location ? `<div class="event-location">📍 ${ev.location}</div>` : ''}
-                  </div>
-                </div>`;
-            }).join('')}
-          </div>`).join('')}
-        <div class="last-updated">Aktualisiert: ${new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'})}</div>
-      </div>`;
-
-    content.innerHTML = html;
-  } catch (err) {
-    content.innerHTML = `<div class="error-state">Fehler beim Laden: ${err.message}<br><small>Bitte .env-Datei prüfen (ICLOUD_EMAIL, ICLOUD_APP_PASSWORD)</small></div>`;
-  } finally {
-    btn.classList.remove('spinning');
-  }
+function initSchalke() {
+  renderSchalke();
+  setInterval(renderSchalke, 60000);
 }
 
 // ── Linie 302 ─────────────────────────────────────────
@@ -398,16 +374,13 @@ async function toggleLight(id, on, btn) {
 
 // ── Auto-Refresh ──────────────────────────────────────
 // ÖPNV: alle 2 Minuten
-// Kalender: alle 10 Minuten
 loadTransport();
 loadLine302();
-loadCalendar();
 loadLights();
-
+initSchalke();
 
 setInterval(loadTransport, 2 * 60 * 1000);
 setInterval(loadLine302,   2 * 60 * 1000);
-setInterval(loadCalendar, 10 * 60 * 1000);
 
 // Mitternacht: Seite neu laden (Datum-Anzeige)
 function scheduleReloadAtMidnight() {

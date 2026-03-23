@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
-const { DAVClient } = require('tsdav');
-const ICAL = require('ical.js');
 const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
@@ -155,89 +153,6 @@ app.get('/api/line302', async (req, res) => {
     console.error('[Line302]', err.message);
     // Stop-Cache zurücksetzen damit nächster Aufruf neu sucht
     line302StopId = null;
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ============================================================
-// iCloud Kalender – CalDAV
-// ============================================================
-let davClient = null;
-
-async function getDavClient() {
-  if (!process.env.ICLOUD_EMAIL || !process.env.ICLOUD_APP_PASSWORD) {
-    throw new Error('ICLOUD_EMAIL oder ICLOUD_APP_PASSWORD nicht konfiguriert');
-  }
-
-  if (!davClient) {
-    davClient = new DAVClient({
-      serverUrl: 'https://caldav.icloud.com',
-      credentials: {
-        username: process.env.ICLOUD_EMAIL,
-        password: process.env.ICLOUD_APP_PASSWORD,
-      },
-      authMethod: 'Basic',
-      defaultAccountType: 'caldav',
-    });
-    await davClient.login();
-  }
-  return davClient;
-}
-
-app.get('/api/calendar', async (req, res) => {
-  try {
-    const client = await getDavClient();
-    const calendars = await client.fetchCalendars();
-
-    const now     = new Date();
-    const weekEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-
-    let events = [];
-
-    for (const calendar of calendars) {
-      let objects;
-      try {
-        objects = await client.fetchCalendarObjects({
-          calendar,
-          timeRange: { start: now.toISOString(), end: weekEnd.toISOString() },
-        });
-      } catch {
-        continue; // Kalender überspringen wenn Fehler
-      }
-
-      for (const obj of objects) {
-        try {
-          const jcal   = ICAL.parse(obj.data);
-          const comp   = new ICAL.Component(jcal);
-          const vevents = comp.getAllSubcomponents('vevent');
-
-          for (const vevent of vevents) {
-            const ev = new ICAL.Event(vevent);
-            const start = ev.startDate.toJSDate();
-            const end   = ev.endDate.toJSDate();
-
-            if (start >= now || end >= now) {
-              events.push({
-                uid:         ev.uid,
-                title:       ev.summary   || '(kein Titel)',
-                start:       start.toISOString(),
-                end:         end.toISOString(),
-                allDay:      ev.startDate.isDate,
-                location:    ev.location  || '',
-                calendar:    calendar.displayName || '',
-                calColor:    calendar.calendarColor || '#4a90e2',
-              });
-            }
-          }
-        } catch { /* ungültiges Event überspringen */ }
-      }
-    }
-
-    events.sort((a, b) => new Date(a.start) - new Date(b.start));
-    res.json(events.slice(0, 15));
-  } catch (err) {
-    console.error('[Calendar]', err.message);
-    davClient = null; // Session zurücksetzen
     res.status(500).json({ error: err.message });
   }
 });

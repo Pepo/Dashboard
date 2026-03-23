@@ -318,73 +318,56 @@ main {
   font-weight: 400;
 }
 
-/* ===== Kalender ===== */
-#calendar-card {
-  overflow: hidden;
-}
-
-.event-list {
-  overflow-y: auto;
-  flex: 1;
-}
-
-.event-list::-webkit-scrollbar { width: 4px; }
-.event-list::-webkit-scrollbar-track { background: transparent; }
-.event-list::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
-
-.event-day-group { margin-bottom: 14px; }
-
-.event-day-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  margin-bottom: 6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--card-border);
-}
-
-.event-item {
+/* ===== Schalke 04 ===== */
+.s04-match {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(48,54,61,0.5);
-}
-.event-item:last-child { border-bottom: none; }
-
-.event-color-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: 4px;
-  flex-shrink: 0;
 }
 
-.event-info { flex: 1; min-width: 0; }
+.s04-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: #c0a060;
+  background: rgba(192,160,96,0.12);
+  border: 1px solid rgba(192,160,96,0.3);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
 
-.event-title {
+.s04-opponent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.s04-club {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.s04-vs {
   font-size: 0.85rem;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-muted);
 }
 
-.event-time {
-  font-size: 0.72rem;
+.s04-datetime {
+  font-size: 0.82rem;
   color: var(--text-muted);
-  margin-top: 1px;
 }
 
-.event-location {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.s04-countdown {
+  font-size: 1.6rem;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ===== Lichter ===== */
