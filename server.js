@@ -126,7 +126,7 @@ app.get('/api/line302', async (req, res) => {
     if (!depRes.ok) throw new Error(`Abfahrten-Fehler: ${depRes.status}`);
     const depData = await depRes.json();
     const all = (depData.departures || depData).filter(
-      d => d.line?.name === '302' || d.line?.id?.includes('302')
+      d => (d.line?.name || '').includes('302') || (d.line?.id || '').includes('302')
     );
 
     // In zwei Richtungsgruppen aufteilen
