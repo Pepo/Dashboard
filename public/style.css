@@ -253,7 +253,13 @@ main {
   display: flex;
   gap: 12px;
 }
-.line302-grid > * { -webkit-flex: 1; flex: 1; }
+.line302-grid > * {
+  -webkit-flex: 0 0 calc(50% - 6px);
+  flex: 0 0 calc(50% - 6px);
+  width: calc(50% - 6px);
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
 .line302-dir {
   background: #0d1117;
@@ -278,21 +284,23 @@ main {
 .line302-departures {
   display: -webkit-flex;
   display: flex;
-  -webkit-flex-wrap: wrap;
-  flex-wrap: wrap;
+  -webkit-flex-direction: column;
+  flex-direction: column;
   gap: 6px;
 }
 
 .dep-chip {
-  display: -webkit-inline-flex;
-  display: inline-flex;
+  display: -webkit-flex;
+  display: flex;
   -webkit-align-items: center;
   align-items: center;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
   gap: 4px;
   background: #161b22;
   border: 1px solid #30363d;
   border-radius: 6px;
-  padding: 4px 10px;
+  padding: 6px 10px;
   font-size: 0.9rem;
   font-weight: 600;
   color: #e6edf3;

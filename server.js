@@ -145,7 +145,7 @@ app.get('/api/line302', async (req, res) => {
     // Maximal 5 Abfahrten pro Richtung
     const directions = Object.entries(groups).map(([dir, deps]) => ({
       direction: dir,
-      departures: deps.slice(0, 5),
+      departures: deps.slice(0, 4),
     }));
 
     res.json({ stopId, directions });
